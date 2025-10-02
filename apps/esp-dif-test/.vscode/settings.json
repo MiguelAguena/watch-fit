@@ -1,0 +1,24 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPath": "/home/mvelasqu/esp/esp-idf",
+    "idf.pythonInstallPath": "/usr/bin/python",
+    "idf.openOcdConfigs": [
+        "board/esp32c6-builtin.cfg"
+    ],
+    "idf.port": "/dev/ttyACM0",
+    "idf.toolsPath": "/home/mvelasqu/.espressif",
+    "idf.customExtraVars": {
+        "IDF_TARGET": "esp32c6",
+        "IDF_PATH": "/home/mvelasqu/esp/esp-idf"
+    },
+    "clangd.path": "/home/mvelasqu/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+    "clangd.arguments": [
+        "--background-index",
+        "--query-driver=/home/mvelasqu/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc",
+        "--compile-commands-dir=/home/mvelasqu/use/usp/5ma/lab_emb/projeto/watch-fit/apps/esp-dif-test/build"
+    ],
+    "idf.flashType": "JTAG",
+    "terminal.integrated.env.linux": {
+        "IDF_PATH": "/home/mvelasqu/esp/esp-idf"
+    }
+}

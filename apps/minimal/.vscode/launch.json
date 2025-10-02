@@ -1,0 +1,84 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug ESP32-C6",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/esp_c6_cpp_app.elf",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/home/mvelasqu/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gdb",
+            "miDebuggerServerAddress": "localhost:3333",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set architecture to RISC-V 32-bit",
+                    "text": "set architecture riscv:rv32",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Connect to OpenOCD",
+                    "text": "target remote localhost:3333",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Reset and halt",
+                    "text": "monitor reset halt",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Load firmware",
+                    "text": "load",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Set main breakpoint",
+                    "text": "break app_main",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build for Debug - ESP-IDF",
+            "postDebugTask": "",
+            "logging": {
+                "engineLogging": false,
+                "programOutput": true,
+                "exceptions": true
+            }
+        },
+        {
+            "name": "Attach to ESP32-C6",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/build/esp_c6_cpp_app.elf",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/home/mvelasqu/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gdb",
+            "miDebuggerServerAddress": "localhost:3333",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set architecture to RISC-V 32-bit",
+                    "text": "set architecture riscv:rv32",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "engineLogging": false,
+                "programOutput": true,
+                "exceptions": true
+            }
+        }
+    ]
+}
