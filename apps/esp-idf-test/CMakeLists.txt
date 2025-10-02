@@ -5,5 +5,5 @@
 cmake_minimum_required(VERSION 3.5)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(esp-dif-test)
+project(esp-idf-test)
 target_compile_options(${COMPONENT_LIB} PRIVATE -std=gnu++23)
