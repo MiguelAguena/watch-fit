@@ -1,7 +1,7 @@
 {
     "C_Cpp.intelliSenseEngine": "default",
     "idf.espIdfPath": "/home/mvelasqu/esp/esp-idf",
-    "idf.pythonInstallPath": "/usr/bin/python",
+    "idf.pythonInstallPath": "/usr/bin/python3",
     "idf.openOcdConfigs": [
         "board/esp32c6-builtin.cfg"
     ],

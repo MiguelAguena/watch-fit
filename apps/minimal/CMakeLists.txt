@@ -1,6 +1,11 @@
+# For more information about build system see
+# https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html
+# The following five lines of boilerplate have to be in your project's
+# CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.16)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-set(PROJECT_NAME "esp_c6_cpp_app")
-# Tell IDF we use C and C++
-project(${PROJECT_NAME} C CXX)
-# IDF handles toolchain/ld/startup/bootloader/partitions for ESP32-C6
+project(minimal-test)
+# "Trim" the build. Include the minimal set of components, main, and anything it depends on.
+idf_build_set_property(MINIMAL_BUILD ON)
+target_compile_options(${COMPONENT_LIB} PRIVATE -std=gnu++23)
