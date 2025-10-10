@@ -35,7 +35,7 @@ extern "C" {
 
 /* Defines */
 #define TAG "NimBLE_Beacon"
-#define DEVICE_NAME "NimBLE_Beacon"
+#define DEVICE_NAME "WATCH-FIT_NODE"
 
 #endif // COMMON_H
 

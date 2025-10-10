@@ -1,3 +1,18 @@
 {
-    "idf.pythonInstallPath": "/usr/bin/python"
+  "idf.pythonInstallPath": "/usr/bin/python3",
+  "idf.openOcdConfigs": [
+    "board/esp32c6-ftdi.cfg"
+  ],
+  "idf.espIdfPath": "/home/miguelaguena/esp/esp-idf",
+  "idf.toolsPath": "/home/miguelaguena/.espressif",
+  "idf.flashType": "UART",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32c6"
+  },
+  "clangd.path": "/home/miguelaguena/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=/home/miguelaguena/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc",
+    "--compile-commands-dir=/home/miguelaguena/Documents/watch-fit/build"
+  ]
 }
