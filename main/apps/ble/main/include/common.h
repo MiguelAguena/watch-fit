@@ -12,12 +12,14 @@ extern "C" {
 
 /* Includes */
 /* STD APIs */
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
 /* ESP APIs */
 #include "esp_log.h"
+#include "esp_random.h"
 #include "nvs_flash.h"
 #include "sdkconfig.h"
 
