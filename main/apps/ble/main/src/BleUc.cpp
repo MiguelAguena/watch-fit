@@ -291,7 +291,7 @@ void BleUc::start_advertising(void) {
 
     /* Start advertising */
     rc = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params,
-                           &BleUc::gap_event_handler, NULL);
+                           BleUc::gap_event_handler, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "failed to start advertising, error code: %d", rc);
         return;
@@ -541,11 +541,17 @@ void BleUc::on_stack_sync(void)
     adv_init();
 }
 
+void BleUc::on_stack_sync_trampoline(void* user)
+{
+    BleUc* self = static_cast<BleUc*>(user);
+    self->on_stack_sync();
+}
+
 void BleUc::nimble_host_config_init(void)
 {
     /* Set host callbacks */
-    ble_hs_cfg.reset_cb = &BleUc::on_stack_reset;
-    ble_hs_cfg.sync_cb = &BleUc::on_stack_sync;
+    ble_hs_cfg.reset_cb = BleUc::on_stack_reset;
+    ble_hs_cfg.sync_cb = BleUc::on_stack_sync_trampoline;
     ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
 
     /* Store host configuration */

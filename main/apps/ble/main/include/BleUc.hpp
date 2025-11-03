@@ -30,7 +30,7 @@ class BleUc {
         inline void format_addr(char *addr_str, uint8_t addr[]);
         void print_conn_desc(struct ble_gap_conn_desc *desc);
         void set_random_addr(void);
-        int gap_event_handler(struct ble_gap_event *event, void *arg);
+        int static gap_event_handler(struct ble_gap_event *event, void *arg);
         void start_advertising(void);
         void adv_init(void);
         bool is_connection_encrypted(uint16_t conn_handle);
@@ -44,8 +44,9 @@ class BleUc {
         int gatt_svc_init(void);
 
         //BleUc private functions
-        void on_stack_reset(int reason);
+        void static on_stack_reset(int reason);
         void on_stack_sync(void);
+        void static on_stack_sync_trampoline(void* user);
         void nimble_host_config_init(void);
         
     public:
