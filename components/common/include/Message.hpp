@@ -1,5 +1,7 @@
+#pragma once
+
 enum class MessageType {
-    ValueMessage
+    String
 };
 
 struct Message {

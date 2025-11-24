@@ -4,12 +4,9 @@
 #include "nvs_flash.h"
 #include "sdkconfig.h"
 #include "BleUc.hpp"
-
-extern "C" void print(void*) {
-    printf("a");
-}
+#include "HeartRateUc.hpp"
 
 extern "C" void app_main(void) {
     BleUc bleUc;
-    xTaskCreate(print, "NimBLE Host", 4 * 1024, NULL, 5, NULL);
+    HeartRateUc<BleUc> heartRate(bleUc);
 }

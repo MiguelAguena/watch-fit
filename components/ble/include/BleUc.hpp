@@ -1,15 +1,18 @@
-#include "IUc.hpp"
-#include "BleRoutines.hpp"
+#pragma once
+#include "Uc.hpp"
+//#include "BleRoutines.hpp"
+#include <string>
+#include "esp_log.h"
 
 class BleUc : public Uc<BleUc> {
 private:
-    BleRoutines bleRoutines;
+    //BleRoutines bleRoutines;
+    void handle(std::string value);
 
 public:
     BleUc();
     ~BleUc();
     void taskLoop();
-    void handle();
 
     static_assert(IUcConcept<BleUc, void*>);
 };

@@ -1,3 +1,6 @@
+/*
+
+#pragma once
 //GAP includes and defines
 #include "host/ble_gap.h"
 #include "services/gap/ble_svc_gap.h"
@@ -52,3 +55,5 @@ class BleRoutines {
         BleRoutines();
         void ble_main_task(void *param);
 };
+
+*/

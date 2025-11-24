@@ -6,6 +6,8 @@
 #include "freertos/task.h"
 #include "Message.hpp"
 
+#define TAG "Uc"
+
 template<typename TUc, typename T>
 concept IUcConcept =
     requires {
@@ -16,11 +18,10 @@ concept IUcConcept =
     std::same_as<typename TUc::queue_type, QueueHandle_t> &&
     std::same_as<typename TUc::task_handle_type, TaskHandle_t> &&
 
-    requires(TUc& uc, Message message, T params) {
+    requires(TUc& uc, QueueHandle_t q, Message message, T params) {
     {TUc::taskEntry(params)} -> std::same_as<void>;
-    {uc.sendMessage(message)} -> std::same_as<void>;
+    {uc.sendMessage(q, message)} -> std::same_as<void>;
     {uc.taskLoop()} -> std::same_as<void>;
-    {uc.handle()} -> std::same_as<void>;
 };
 
 template<typename DerivedUc>
@@ -42,7 +43,7 @@ public:
         static_cast<DerivedUc*>(arg)->taskLoop();
     }
 
-    void sendMessage(const Message& msg) {
-        xQueueSend(queue, &msg, portMAX_DELAY);
+    void sendMessage(QueueHandle_t q, const Message& msg) {
+        xQueueSend(q, &msg, portMAX_DELAY);
     }
 };
