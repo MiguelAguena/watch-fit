@@ -9,7 +9,7 @@
 #include "host/ble_gatt.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-class BleUc {
+class BleRoutines {
     private:
         //Private attributes
         static constexpr ble_uuid16_t heart_rate_svc_uuid = BLE_UUID16_INIT(0x180D);
@@ -49,6 +49,6 @@ class BleUc {
         void nimble_host_config_init(void);
         
     public:
-        BleUc();
-        void nimble_host_task(void *param);
+        BleRoutines();
+        void ble_main_task(void *param);
 };

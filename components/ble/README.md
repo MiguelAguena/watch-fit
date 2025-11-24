@@ -169,10 +169,10 @@ void app_main(void) {
 }
 ```
 
-So far, initialization has been done. We can call `xTaskCreate` to create `nimble_host_task` thread, and let NimBLE host stack run in the background.
+So far, initialization has been done. We can call `xTaskCreate` to create `ble_main_task` thread, and let NimBLE host stack run in the background.
 
 ``` C
-static void nimble_host_task(void *param) {
+static void ble_main_task(void *param) {
     /* Task entry log */
     ESP_LOGI(TAG, "nimble host task has been started!");
 
@@ -187,7 +187,7 @@ void app_main(void) {
     ...
 
     /* Start NimBLE host task thread and return */
-    xTaskCreate(nimble_host_task, "NimBLE Host", 4*1024, NULL, 5, NULL);
+    xTaskCreate(ble_main_task, "NimBLE Host", 4*1024, NULL, 5, NULL);
     return;
 }
 ```
