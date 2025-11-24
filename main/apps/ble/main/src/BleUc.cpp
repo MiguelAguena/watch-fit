@@ -20,12 +20,12 @@ void BleUc::print_conn_desc(struct ble_gap_conn_desc *desc) {
     ESP_LOGI(TAG, "connection handle: %d", desc->conn_handle);
 
     /* Local ID address */
-    format_addr(addr_str, desc->our_id_addr.val);
+    BleUc::format_addr(addr_str, desc->our_id_addr.val);
     ESP_LOGI(TAG, "device id address: type=%d, value=%s",
              desc->our_id_addr.type, addr_str);
 
     /* Peer ID address */
-    format_addr(addr_str, desc->peer_id_addr.val);
+    BleUc::format_addr(addr_str, desc->peer_id_addr.val);
     ESP_LOGI(TAG, "peer id address: type=%d, value=%s", desc->peer_id_addr.type,
              addr_str);
 
@@ -58,6 +58,8 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
     struct ble_gap_conn_desc desc;
 
     /* Handle different GAP event */
+    ESP_LOGI(TAG, "Event received. Type: %d", event->type);
+
     switch (event->type) {
 
         /* Connect event */
@@ -79,7 +81,7 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
                 }
 
                 /* Print connection descriptor */
-                print_conn_desc(&desc);
+                BleUc::print_conn_desc(&desc);
 
                 /* Try to update connection parameters */
                 struct ble_gap_upd_params params = {.itvl_min = desc.conn_itvl,
@@ -98,7 +100,7 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
             }
             /* Connection failed, restart advertising */
             else {
-                start_advertising();
+                BleUc::start_advertising();
             }
             return rc;
 
@@ -109,7 +111,7 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
                     event->disconnect.reason);
 
             /* Restart advertising */
-            start_advertising();
+            BleUc::start_advertising();
             return rc;
 
         /* Connection parameters update event */
@@ -125,7 +127,7 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
                         rc);
                 return rc;
             }
-            print_conn_desc(&desc);
+            BleUc::print_conn_desc(&desc);
             return rc;
 
         /* Advertising complete event */
@@ -133,7 +135,7 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
             /* Advertising completed, restart advertising */
             ESP_LOGI(TAG, "advertise complete; reason=%d",
                     event->adv_complete.reason);
-            start_advertising();
+            BleUc::start_advertising();
             return rc;
 
         /* Notification sent event */
@@ -161,7 +163,7 @@ int BleUc::gap_event_handler(struct ble_gap_event *event, void *arg) {
                     event->subscribe.cur_indicate);
 
             /* GATT subscribe event callback */
-            rc = gatt_svr_subscribe_cb(event); 
+            rc = BleUc::gatt_svr_subscribe_cb(event); 
             if (rc == BLE_ATT_ERR_INSUFFICIENT_AUTHEN) {
                 /* Request connection encryption */
                 return ble_gap_security_initiate(event->subscribe.conn_handle);
@@ -305,7 +307,7 @@ void BleUc::adv_init(void) {
     char addr_str[18] = {0};
 
     /* Make sure we have proper BT identity address set */
-    set_random_addr();
+    BleUc::set_random_addr();
     rc = ble_hs_util_ensure_addr(1);
     if (rc != 0) {
         ESP_LOGE(TAG, "device does not have any available bt address!");
@@ -325,11 +327,11 @@ void BleUc::adv_init(void) {
         ESP_LOGE(TAG, "failed to copy device address, error code: %d", rc);
         return;
     }
-    format_addr(addr_str, addr_val);
+    BleUc::format_addr(addr_str, addr_val);
     ESP_LOGI(TAG, "device address: %s", addr_str);
 
     /* Start advertising. */
-    start_advertising();
+    BleUc::start_advertising();
 }
 
 bool BleUc::is_connection_encrypted(uint16_t conn_handle) {
@@ -399,7 +401,7 @@ void BleUc::send_heart_rate_indication(void) {
 
     /* Check indication and security status */
     if (heart_rate_ind_status &&
-        is_connection_encrypted(heart_rate_chr_conn_handle)) {
+        BleUc::is_connection_encrypted(heart_rate_chr_conn_handle)) {
         ble_gatts_indicate(heart_rate_chr_conn_handle,
                            heart_rate_chr_val_handle);
     }
@@ -462,7 +464,7 @@ int BleUc::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
         heart_rate_ind_status = event->subscribe.cur_indicate;
 
         /* Check security status */
-        if (!is_connection_encrypted(event->subscribe.conn_handle)) {
+        if (!BleUc::is_connection_encrypted(event->subscribe.conn_handle)) {
             ESP_LOGE(TAG, "failed to subscribe to heart rate measurement, "
                           "connection not encrypted!");
             return BLE_ATT_ERR_INSUFFICIENT_AUTHEN;
@@ -538,20 +540,14 @@ void BleUc::on_stack_reset(int reason)
 void BleUc::on_stack_sync(void)
 {
     /* On stack sync, do advertising initialization */
-    adv_init();
-}
-
-void BleUc::on_stack_sync_trampoline(void* user)
-{
-    BleUc* self = static_cast<BleUc*>(user);
-    self->on_stack_sync();
+    BleUc::adv_init();
 }
 
 void BleUc::nimble_host_config_init(void)
 {
     /* Set host callbacks */
     ble_hs_cfg.reset_cb = BleUc::on_stack_reset;
-    ble_hs_cfg.sync_cb = BleUc::on_stack_sync_trampoline;
+    ble_hs_cfg.sync_cb = BleUc::on_stack_sync;
     ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
 
     /* Store host configuration */

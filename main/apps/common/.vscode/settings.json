@@ -1,0 +1,41 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.autocomplete": "default",
+    "C_Cpp.formatting": "clangFormat",
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+    "C_Cpp.clang_format_style": "file",
+    "C_Cpp.clang_format_fallbackStyle": "Google",
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "*.cpp": "cpp",
+        "*.hpp": "cpp",
+        "sdkconfig": "kconfig"
+    },
+    "files.exclude": {
+        "**/build": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true
+    },
+    "search.exclude": {
+        "**/build": true,
+        "**/.git": true,
+        "**/node_modules": true
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "terminal.integrated.env.linux": {
+        "IDF_PATH": "/home/mvelasqu/esp/esp-idf"
+    },
+    "espIdf.port": "/dev/ttyUSB0",
+    "espIdf.flashBaudRate": "460800",
+    "espIdf.monitorBaudRate": "115200"
+}

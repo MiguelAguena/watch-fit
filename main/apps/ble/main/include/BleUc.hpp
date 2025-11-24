@@ -16,8 +16,8 @@ class BleUc {
         static constexpr ble_uuid16_t heart_rate_chr_uuid = BLE_UUID16_INIT(0x2A37);
         static constexpr uint8_t esp_uri[] = {BLE_GAP_URI_PREFIX_HTTPS, '/', '/', 'e', 's', 'p', 'r', 'e', 's', 's', 'i', 'f', '.', 'c', 'o', 'm'};
         
-        uint8_t own_addr_type;
-        uint8_t addr_val[6];
+        static uint8_t own_addr_type;
+        static uint8_t addr_val[6];
         
         uint8_t heart_rate_chr_val[2];
         uint16_t heart_rate_chr_val_handle;
@@ -27,26 +27,25 @@ class BleUc {
         static const struct ble_gatt_svc_def gatt_svr_svcs[];
 
         //GAP private functions
-        inline void format_addr(char *addr_str, uint8_t addr[]);
-        void print_conn_desc(struct ble_gap_conn_desc *desc);
-        void set_random_addr(void);
+        inline void static format_addr(char *addr_str, uint8_t addr[]);
+        void static print_conn_desc(struct ble_gap_conn_desc *desc);
+        void static set_random_addr(void);
         int static gap_event_handler(struct ble_gap_event *event, void *arg);
-        void start_advertising(void);
-        void adv_init(void);
-        bool is_connection_encrypted(uint16_t conn_handle);
+        void static start_advertising(void);
+        void static adv_init(void);
+        bool static is_connection_encrypted(uint16_t conn_handle);
         int gap_init(void);
 
         //GATT private functions
         int heart_rate_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
         void send_heart_rate_indication(void);
         void gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg);
-        int gatt_svr_subscribe_cb(struct ble_gap_event *event);
+        int static gatt_svr_subscribe_cb(struct ble_gap_event *event);
         int gatt_svc_init(void);
 
         //BleUc private functions
         void static on_stack_reset(int reason);
-        void on_stack_sync(void);
-        void static on_stack_sync_trampoline(void* user);
+        void static on_stack_sync(void);
         void nimble_host_config_init(void);
         
     public:
