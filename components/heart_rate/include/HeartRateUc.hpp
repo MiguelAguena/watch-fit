@@ -28,8 +28,7 @@ public:
             m.type = MessageType::String;
             std::string data = std::to_string(int(heart_rate));
             m.data = &data;
-            Message& m_ref = m;
-            this->sendMessage(subscriber.queue, m_ref);
+            this->sendMessage(subscriber.queue, m);
             vTaskDelay(HEART_RATE_TASK_PERIOD);
         }
     }
