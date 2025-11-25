@@ -1,7 +1,5 @@
-/*
-
 #include "common.h"
-#include "BleRoutines.hpp"
+#include "BlePeripheralRoutines.hpp"
 
 extern "C" void ble_store_config_init(void);
 
@@ -9,12 +7,12 @@ extern "C" void ble_store_config_init(void);
 ////GAP
 
 //////GAP functions
-void BleRoutines::format_addr(char *addr_str, uint8_t addr[]) {
+void BlePeripheralRoutines::format_addr(char *addr_str, uint8_t addr[]) {
     sprintf(addr_str, "%02X:%02X:%02X:%02X:%02X:%02X", addr[0], addr[1],
             addr[2], addr[3], addr[4], addr[5]);
 }
 
-void BleRoutines::print_conn_desc(struct ble_gap_conn_desc *desc) {
+void BlePeripheralRoutines::print_conn_desc(struct ble_gap_conn_desc *desc) {
     // Local variables
     char addr_str[18] = {0};
 
@@ -22,12 +20,12 @@ void BleRoutines::print_conn_desc(struct ble_gap_conn_desc *desc) {
     ESP_LOGI(TAG, "connection handle: %d", desc->conn_handle);
 
     // Local ID address
-    BleRoutines::format_addr(addr_str, desc->our_id_addr.val);
+    BlePeripheralRoutines::format_addr(addr_str, desc->our_id_addr.val);
     ESP_LOGI(TAG, "device id address: type=%d, value=%s",
              desc->our_id_addr.type, addr_str);
 
     // Peer ID address
-    BleRoutines::format_addr(addr_str, desc->peer_id_addr.val);
+    BlePeripheralRoutines::format_addr(addr_str, desc->peer_id_addr.val);
     ESP_LOGI(TAG, "peer id address: type=%d, value=%s", desc->peer_id_addr.type,
              addr_str);
 
@@ -40,7 +38,7 @@ void BleRoutines::print_conn_desc(struct ble_gap_conn_desc *desc) {
              desc->sec_state.bonded);
 }
 
-void BleRoutines::set_random_addr(void) {
+void BlePeripheralRoutines::set_random_addr(void) {
     // Local variables
     int rc = 0;
     ble_addr_t addr;
@@ -54,7 +52,7 @@ void BleRoutines::set_random_addr(void) {
     assert(rc == 0);
 }
 
-int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
+int BlePeripheralRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
     // Local variables
     int rc = 0;
     struct ble_gap_conn_desc desc;
@@ -83,7 +81,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
                 }
 
                 // Print connection descriptor
-                BleRoutines::print_conn_desc(&desc);
+                BlePeripheralRoutines::print_conn_desc(&desc);
 
                 // Try to update connection parameters
                 struct ble_gap_upd_params params = {.itvl_min = desc.conn_itvl,
@@ -102,7 +100,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
             }
             // Connection failed, restart advertising
             else {
-                BleRoutines::start_advertising();
+                BlePeripheralRoutines::start_advertising();
             }
             return rc;
 
@@ -113,7 +111,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
                     event->disconnect.reason);
 
             // Restart advertising
-            BleRoutines::start_advertising();
+            BlePeripheralRoutines::start_advertising();
             return rc;
 
         // Connection parameters update event
@@ -129,7 +127,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
                         rc);
                 return rc;
             }
-            BleRoutines::print_conn_desc(&desc);
+            BlePeripheralRoutines::print_conn_desc(&desc);
             return rc;
 
         // Advertising complete event
@@ -137,7 +135,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
             // Advertising completed, restart advertising
             ESP_LOGI(TAG, "advertise complete; reason=%d",
                     event->adv_complete.reason);
-            BleRoutines::start_advertising();
+            BlePeripheralRoutines::start_advertising();
             return rc;
 
         // Notification sent event
@@ -165,7 +163,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
                     event->subscribe.cur_indicate);
 
             // GATT subscribe event callback
-            rc = BleRoutines::gatt_svr_subscribe_cb(event); 
+            rc = BlePeripheralRoutines::gatt_svr_subscribe_cb(event); 
             if (rc == BLE_ATT_ERR_INSUFFICIENT_AUTHEN) {
                 // Request connection encryption
                 return ble_gap_security_initiate(event->subscribe.conn_handle);
@@ -229,7 +227,7 @@ int BleRoutines::gap_event_handler(struct ble_gap_event *event, void *arg) {
     return rc;
 }
 
-void BleRoutines::start_advertising(void) {
+void BlePeripheralRoutines::start_advertising(void) {
     // Local variables
     int rc = 0;
     const char *name;
@@ -295,7 +293,7 @@ void BleRoutines::start_advertising(void) {
 
     // Start advertising
     rc = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params,
-                           BleRoutines::gap_event_handler, NULL);
+                           BlePeripheralRoutines::gap_event_handler, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "failed to start advertising, error code: %d", rc);
         return;
@@ -303,13 +301,13 @@ void BleRoutines::start_advertising(void) {
     ESP_LOGI(TAG, "advertising started!");
 }
 
-void BleRoutines::adv_init(void) {
+void BlePeripheralRoutines::adv_init(void) {
     // Local variables
     int rc = 0;
     char addr_str[18] = {0};
 
     // Make sure we have proper BT identity address set
-    BleRoutines::set_random_addr();
+    BlePeripheralRoutines::set_random_addr();
     rc = ble_hs_util_ensure_addr(1);
     if (rc != 0) {
         ESP_LOGE(TAG, "device does not have any available bt address!");
@@ -329,14 +327,14 @@ void BleRoutines::adv_init(void) {
         ESP_LOGE(TAG, "failed to copy device address, error code: %d", rc);
         return;
     }
-    BleRoutines::format_addr(addr_str, addr_val);
+    BlePeripheralRoutines::format_addr(addr_str, addr_val);
     ESP_LOGI(TAG, "device address: %s", addr_str);
 
     // Start advertising.
-    BleRoutines::start_advertising();
+    BlePeripheralRoutines::start_advertising();
 }
 
-bool BleRoutines::is_connection_encrypted(uint16_t conn_handle) {
+bool BlePeripheralRoutines::is_connection_encrypted(uint16_t conn_handle) {
     // Local variables
     int rc = 0;
     struct ble_gap_conn_desc desc;
@@ -352,7 +350,7 @@ bool BleRoutines::is_connection_encrypted(uint16_t conn_handle) {
     return desc.sec_state.encrypted;
 }
 
-int BleRoutines::heart_rate_chr_access(uint16_t conn_handle, uint16_t attr_handle,
+int BlePeripheralRoutines::heart_rate_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                                  struct ble_gatt_access_ctxt *ctxt, void *arg) {
     // Local variables
     int rc;
@@ -395,7 +393,7 @@ error:
     return BLE_ATT_ERR_UNLIKELY;
 }
 
-void BleRoutines::send_heart_rate_indication(void) {
+void BlePeripheralRoutines::send_heart_rate_indication(void) {
     // Check if connection handle is initialized
     if (!heart_rate_chr_conn_handle_inited) {
         return;
@@ -403,19 +401,19 @@ void BleRoutines::send_heart_rate_indication(void) {
 
     // Check indication and security status
     if (heart_rate_ind_status &&
-        BleRoutines::is_connection_encrypted(heart_rate_chr_conn_handle)) {
+        BlePeripheralRoutines::is_connection_encrypted(heart_rate_chr_conn_handle)) {
         ble_gatts_indicate(heart_rate_chr_conn_handle,
                            heart_rate_chr_val_handle);
     }
 }
 
 //
- *  Handle GATT attribute register events
- *      - Service register event
- *      - Characteristic register event
- *      - Descriptor register event
+//*  Handle GATT attribute register events
+//*      - Service register event
+//*      - Characteristic register event
+//*      - Descriptor register event
 
-void BleRoutines::gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg) {
+void BlePeripheralRoutines::gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg) {
     // Local variables
     char buf[BLE_UUID_STR_LEN];
 
@@ -453,11 +451,11 @@ void BleRoutines::gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void
 }
 
 //
- *  GATT server subscribe event callback
- *      1. Update heart rate subscription status
+//*  GATT server subscribe event callback
+//*      1. Update heart rate subscription status
 
 
-int BleRoutines::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
+int BlePeripheralRoutines::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
     // Check attribute handle
     if (event->subscribe.attr_handle == heart_rate_chr_val_handle) {
         // Update heart rate subscription status
@@ -466,7 +464,7 @@ int BleRoutines::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
         heart_rate_ind_status = event->subscribe.cur_indicate;
 
         // Check security status
-        if (!BleRoutines::is_connection_encrypted(event->subscribe.conn_handle)) {
+        if (!BlePeripheralRoutines::is_connection_encrypted(event->subscribe.conn_handle)) {
             ESP_LOGE(TAG, "failed to subscribe to heart rate measurement, "
                           "connection not encrypted!");
             return BLE_ATT_ERR_INSUFFICIENT_AUTHEN;
@@ -476,12 +474,12 @@ int BleRoutines::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
 }
 
 //
- *  GATT server initialization
- *      1. Initialize GATT service
- *      2. Update NimBLE host GATT services counter
- *      3. Add GATT services to server
+//*  GATT server initialization
+//*      1. Initialize GATT service
+//*      2. Update NimBLE host GATT services counter
+//*      3. Add GATT services to server
 
-int BleRoutines::gatt_svc_init(void) {
+int BlePeripheralRoutines::gatt_svc_init(void) {
     // Local variables
     int rc;
 
@@ -504,7 +502,7 @@ int BleRoutines::gatt_svc_init(void) {
 }
 
 
-int BleRoutines::gap_init(void) {
+int BlePeripheralRoutines::gap_init(void) {
     // Local variables
     int rc = 0;
 
@@ -529,34 +527,34 @@ int BleRoutines::gap_init(void) {
 }
 
 //
- *  Stack event callback functions
- *      - on_stack_reset is called when host resets BLE stack due to errors
- *      - on_stack_sync is called when host has synced with controller
+//*  Stack event callback functions
+//*      - on_stack_reset is called when host resets BLE stack due to errors
+//*      - on_stack_sync is called when host has synced with controller
 
-void BleRoutines::on_stack_reset(int reason)
+void BlePeripheralRoutines::on_stack_reset(int reason)
 {
     // On reset, print reset reason to console
     ESP_LOGI(TAG, "nimble stack reset, reset reason: %d", reason);
 }
 
-void BleRoutines::on_stack_sync(void)
+void BlePeripheralRoutines::on_stack_sync(void)
 {
     // On stack sync, do advertising initialization
-    BleRoutines::adv_init();
+    BlePeripheralRoutines::adv_init();
 }
 
-void BleRoutines::nimble_host_config_init(void)
+void BlePeripheralRoutines::nimble_host_config_init(void)
 {
     // Set host callbacks
-    ble_hs_cfg.reset_cb = BleRoutines::on_stack_reset;
-    ble_hs_cfg.sync_cb = BleRoutines::on_stack_sync;
+    ble_hs_cfg.reset_cb = BlePeripheralRoutines::on_stack_reset;
+    ble_hs_cfg.sync_cb = BlePeripheralRoutines::on_stack_sync;
     ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
 
     // Store host configuration
     ble_store_config_init();
 }
 
-void BleRoutines::ble_main_task(void *param)
+void BlePeripheralRoutines::ble_main_task(void *param)
 {
     // Task entry log
     ESP_LOGI(TAG, "nimble host task has been started!");
@@ -568,7 +566,7 @@ void BleRoutines::ble_main_task(void *param)
     vTaskDelete(NULL);
 }
 
-BleRoutines::BleRoutines() {
+BlePeripheralRoutines::BlePeripheralRoutines() {
     // Local variables
     addr_val[6] = {0};
     heart_rate_chr_val[2] = {0};
@@ -584,7 +582,7 @@ BleRoutines::BleRoutines() {
             (struct ble_gatt_chr_def[]){
                 {// Heart rate characteristic
                 .uuid = &heart_rate_chr_uuid.u,
-                .access_cb = &BleRoutines::heart_rate_chr_access,
+                .access_cb = &BlePeripheralRoutines::heart_rate_chr_access,
                 .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE |
                         BLE_GATT_CHR_F_READ_ENC,
                 .val_handle = &heart_rate_chr_val_handle},
@@ -641,5 +639,3 @@ BleRoutines::BleRoutines() {
     // NimBLE host configuration initialization
     nimble_host_config_init();
 }
-
-*/

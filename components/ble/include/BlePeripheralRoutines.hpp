@@ -1,5 +1,3 @@
-/*
-
 #pragma once
 //GAP includes and defines
 #include "host/ble_gap.h"
@@ -12,7 +10,7 @@
 #include "host/ble_gatt.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-class BleRoutines {
+class BlePeripheralRoutines {
     private:
         //Private attributes
         static constexpr ble_uuid16_t heart_rate_svc_uuid = BLE_UUID16_INIT(0x180D);
@@ -52,8 +50,6 @@ class BleRoutines {
         void nimble_host_config_init(void);
         
     public:
-        BleRoutines();
+        BlePeripheralRoutines();
         void ble_main_task(void *param);
 };
-
-*/
