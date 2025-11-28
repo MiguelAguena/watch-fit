@@ -17,6 +17,8 @@ namespace driven_ports::network {
         // Sends data over to the parent node.
         virtual bool send_data_to_parent(const uint8_t* data, std::size_t size) = 0;
 
+        //TODO: Method for parent to notify children to start.
+
         // Waits for and accepts a connection from a child node, returning its NodeId.
         virtual NodeId wait_for_child_node_connection() = 0;
 
