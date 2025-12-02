@@ -163,7 +163,7 @@ int BlePeripheralRoutines::gap_event_handler(struct ble_gap_event *event, void *
                     event->subscribe.cur_indicate);
 
             // GATT subscribe event callback
-            rc = BlePeripheralRoutines::gatt_svr_subscribe_cb(event); 
+            rc = BlePeripheralRoutines::gatt_server_subscribe_cb(event); 
             if (rc == BLE_ATT_ERR_INSUFFICIENT_AUTHEN) {
                 // Request connection encryption
                 return ble_gap_security_initiate(event->subscribe.conn_handle);
@@ -350,7 +350,7 @@ bool BlePeripheralRoutines::is_connection_encrypted(uint16_t conn_handle) {
     return desc.sec_state.encrypted;
 }
 
-int BlePeripheralRoutines::heart_rate_chr_access(uint16_t conn_handle, uint16_t attr_handle,
+int BlePeripheralRoutines::messaging_characteristic_access(uint16_t conn_handle, uint16_t attr_handle,
                                  struct ble_gatt_access_ctxt *ctxt, void *arg) {
     // Local variables
     int rc;
@@ -371,11 +371,11 @@ int BlePeripheralRoutines::heart_rate_chr_access(uint16_t conn_handle, uint16_t 
         }
 
         // Verify attribute handle
-        if (attr_handle == heart_rate_chr_val_handle) {
+        if (attr_handle == messaging_characteristic_val_handle) {
             // Update access buffer value
-            heart_rate_chr_val[1] = get_heart_rate();
-            rc = os_mbuf_append(ctxt->om, &heart_rate_chr_val,
-                                sizeof(heart_rate_chr_val));
+            messaging_characteristic_val[1] = 0; //CHANGE LATERRRRRR
+            rc = os_mbuf_append(ctxt->om, &messaging_characteristic_val,
+                                sizeof(messaging_characteristic_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
         goto error;
@@ -393,17 +393,17 @@ error:
     return BLE_ATT_ERR_UNLIKELY;
 }
 
-void BlePeripheralRoutines::send_heart_rate_indication(void) {
+void BlePeripheralRoutines::send_messaging_indication(void) {
     // Check if connection handle is initialized
-    if (!heart_rate_chr_conn_handle_inited) {
+    if (!messaging_characteristic_conn_handle_inited) {
         return;
     }
 
     // Check indication and security status
-    if (heart_rate_ind_status &&
-        BlePeripheralRoutines::is_connection_encrypted(heart_rate_chr_conn_handle)) {
-        ble_gatts_indicate(heart_rate_chr_conn_handle,
-                           heart_rate_chr_val_handle);
+    if (messaging_indication_status &&
+        BlePeripheralRoutines::is_connection_encrypted(messaging_characteristic_conn_handle)) {
+        ble_gatts_indicate(messaging_characteristic_conn_handle,
+                           messaging_characteristic_val_handle);
     }
 }
 
@@ -413,7 +413,7 @@ void BlePeripheralRoutines::send_heart_rate_indication(void) {
 //*      - Characteristic register event
 //*      - Descriptor register event
 
-void BlePeripheralRoutines::gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg) {
+void BlePeripheralRoutines::gatt_server_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg) {
     // Local variables
     char buf[BLE_UUID_STR_LEN];
 
@@ -455,13 +455,13 @@ void BlePeripheralRoutines::gatt_svr_register_cb(struct ble_gatt_register_ctxt *
 //*      1. Update heart rate subscription status
 
 
-int BlePeripheralRoutines::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
+int BlePeripheralRoutines::gatt_server_subscribe_cb(struct ble_gap_event *event) {
     // Check attribute handle
-    if (event->subscribe.attr_handle == heart_rate_chr_val_handle) {
+    if (event->subscribe.attr_handle == messaging_characteristic_val_handle) {
         // Update heart rate subscription status
-        heart_rate_chr_conn_handle = event->subscribe.conn_handle;
-        heart_rate_chr_conn_handle_inited = true;
-        heart_rate_ind_status = event->subscribe.cur_indicate;
+        messaging_characteristic_conn_handle = event->subscribe.conn_handle;
+        messaging_characteristic_conn_handle_inited = true;
+        messaging_indication_status = event->subscribe.cur_indicate;
 
         // Check security status
         if (!BlePeripheralRoutines::is_connection_encrypted(event->subscribe.conn_handle)) {
@@ -479,7 +479,7 @@ int BlePeripheralRoutines::gatt_svr_subscribe_cb(struct ble_gap_event *event) {
 //*      2. Update NimBLE host GATT services counter
 //*      3. Add GATT services to server
 
-int BlePeripheralRoutines::gatt_svc_init(void) {
+int BlePeripheralRoutines::gatt_service_init(void) {
     // Local variables
     int rc;
 
@@ -487,13 +487,13 @@ int BlePeripheralRoutines::gatt_svc_init(void) {
     ble_svc_gatt_init();
 
     // 2. Update GATT services counter
-    rc = ble_gatts_count_cfg(gatt_svr_svcs);
+    rc = ble_gatts_count_cfg(gatt_server_services);
     if (rc != 0) {
         return rc;
     }
 
     // 3. Add GATT services
-    rc = ble_gatts_add_svcs(gatt_svr_svcs);
+    rc = ble_gatts_add_svcs(gatt_server_services);
     if (rc != 0) {
         return rc;
     }
@@ -569,23 +569,23 @@ void BlePeripheralRoutines::ble_main_task(void *param)
 BlePeripheralRoutines::BlePeripheralRoutines() {
     // Local variables
     addr_val[6] = {0};
-    heart_rate_chr_val[2] = {0};
-    heart_rate_chr_conn_handle = 0;
-    heart_rate_chr_conn_handle_inited = false;
-    heart_rate_ind_status = false;
+    messaging_characteristic_val[2] = {0};
+    messaging_characteristic_conn_handle = 0;
+    messaging_characteristic_conn_handle_inited = false;
+    messaging_indication_status = false;
 
-    static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
+    static const struct ble_gatt_svc_def gatt_server_services[] = {
         // Heart rate service
         {.type = BLE_GATT_SVC_TYPE_PRIMARY,
-        .uuid = &heart_rate_svc_uuid.u,
+        .uuid = &messaging_service_uuid.u,
         .characteristics =
             (struct ble_gatt_chr_def[]){
                 {// Heart rate characteristic
-                .uuid = &heart_rate_chr_uuid.u,
-                .access_cb = &BlePeripheralRoutines::heart_rate_chr_access,
+                .uuid = &messaging_characteristic_uuid.u,
+                .access_cb = &BlePeripheralRoutines::messaging_characteristic_access,
                 .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE |
                         BLE_GATT_CHR_F_READ_ENC,
-                .val_handle = &heart_rate_chr_val_handle},
+                .val_handle = &messaging_characteristic_val_handle},
                 {
                     0, // No more characteristics in this service.
                 }}},
@@ -630,7 +630,7 @@ BlePeripheralRoutines::BlePeripheralRoutines() {
     }
 
     // GATT server initialization
-    rc = gatt_svc_init();
+    rc = gatt_service_init();
     if (rc != 0) {
         ESP_LOGE(TAG, "failed to initialize GATT server, error code: %d", rc);
         return;
