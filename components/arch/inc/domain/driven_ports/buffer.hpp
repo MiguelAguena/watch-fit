@@ -12,7 +12,7 @@ namespace driven_ports::buffer {
 
         virtual bool append(domain::tracking::TrackingState const& state) = 0;
         virtual bool has_data() const = 0;
-        virtual bool send_to_parent'() = 0;
+        virtual bool send_to_parent() = 0;
     };
 
 }
