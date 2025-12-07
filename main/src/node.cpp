@@ -5,8 +5,10 @@
 #include "sdkconfig.h"
 #include "BleUc.hpp"
 #include "HeartRateUc.hpp"
+#include "BleNetworkPort.hpp"
 
 extern "C" void app_main(void) {
     BleUc bleUc;
+    //BleNetworkPort bleNetWorkPort;
     HeartRateUc<BleUc> heartRate(bleUc);
 }

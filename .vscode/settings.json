@@ -76,5 +76,7 @@
     "xstring": "cpp",
     "xtr1common": "cpp",
     "xutility": "cpp"
-  }
+  },
+  "idf.monitorPort": "COM7",
+  "idf.portWin": "COM7"
 }

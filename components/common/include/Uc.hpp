@@ -6,7 +6,7 @@
 #include "freertos/task.h"
 #include "Message.hpp"
 
-#define TAG "Uc"
+#define TAG "Node"
 
 template<typename TUc, typename T>
 concept IUcConcept =

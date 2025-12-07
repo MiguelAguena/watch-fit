@@ -1,4 +1,5 @@
 #pragma once
+#include "common.h"
 //GAP includes and defines
 #include "host/ble_gap.h"
 #include "services/gap/ble_svc_gap.h"
@@ -13,7 +14,27 @@
 
 class BlePeripheralRoutines {
     private:
-        //Private attributes
+        //GAP private functions
+        inline void static format_addr(char *addr_str, uint8_t addr[]);
+        void static print_conn_desc(struct ble_gap_conn_desc *desc);
+        void static set_random_addr(void);
+        int static gap_event_handler(struct ble_gap_event *event, void *arg);
+        void static start_advertising(void);
+        void static adv_init(void);
+        bool static is_connection_encrypted(uint16_t conn_handle);
+        int gap_init(void);
+
+        //GATT private functions
+        void static gatt_server_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg);
+        int static gatt_server_subscribe_cb(struct ble_gap_event *event);
+        int gatt_service_init(void);
+
+        //BleUc private functions
+        void static on_stack_reset(int reason);
+        void static on_stack_sync(void);
+        void nimble_host_config_init(void);
+        
+    public:
         static constexpr ble_uuid16_t messaging_service_uuid = BLE_UUID16_INIT(0x180D);
         static constexpr ble_uuid16_t messaging_characteristic_uuid = BLE_UUID16_INIT(0x2A37);
         static constexpr uint8_t esp_uri[] = {BLE_GAP_URI_PREFIX_HTTPS, '/', '/', 'e', 's', 'p', 'r', 'e', 's', 's', 'i', 'f', '.', 'c', 'o', 'm'};
@@ -26,31 +47,30 @@ class BlePeripheralRoutines {
         static uint16_t messaging_characteristic_conn_handle;
         static bool messaging_characteristic_conn_handle_inited;
         static bool messaging_indication_status;
-        static const struct ble_gatt_svc_def gatt_server_services[];
 
-        //GAP private functions
-        inline void static format_addr(char *addr_str, uint8_t addr[]);
-        void static print_conn_desc(struct ble_gap_conn_desc *desc);
-        void static set_random_addr(void);
-        int static gap_event_handler(struct ble_gap_event *event, void *arg);
-        void static start_advertising(void);
-        void static adv_init(void);
-        bool static is_connection_encrypted(uint16_t conn_handle);
-        int gap_init(void);
-
-        //GATT private functions
+        bool send_messaging_indication(uint8_t data);
         int static messaging_characteristic_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
-        void send_messaging_indication(void);
-        void gatt_server_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg);
-        int static gatt_server_subscribe_cb(struct ble_gap_event *event);
-        int gatt_service_init(void);
-
-        //BleUc private functions
-        void static on_stack_reset(int reason);
-        void static on_stack_sync(void);
-        void nimble_host_config_init(void);
-        
-    public:
         BlePeripheralRoutines();
         void ble_main_task(void *param);
+
+        inline static struct ble_gatt_svc_def gatt_server_services[] = {
+            // Messaging service
+            {.type = BLE_GATT_SVC_TYPE_PRIMARY,
+            .uuid = &BlePeripheralRoutines::messaging_service_uuid.u,
+            .characteristics =
+                (struct ble_gatt_chr_def[]){
+                    {// Messaging characteristic
+                    .uuid = &BlePeripheralRoutines::messaging_characteristic_uuid.u,
+                    .access_cb = &BlePeripheralRoutines::messaging_characteristic_access,
+                    .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE |
+                            BLE_GATT_CHR_F_READ_ENC,
+                    .val_handle = &BlePeripheralRoutines::messaging_characteristic_val_handle},
+                    {
+                        0, // No more characteristics in this service.
+                    }}},
+
+            {
+                0, // No more services.
+            },
+        };
 };

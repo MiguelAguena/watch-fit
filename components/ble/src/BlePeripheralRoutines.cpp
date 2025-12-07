@@ -1,9 +1,17 @@
-#include "common.h"
 #include "BlePeripheralRoutines.hpp"
 
 extern "C" void ble_store_config_init(void);
 
-//Private stuff
+//Static variable definitions (ugly, I know)
+    // Local variables
+    uint8_t BlePeripheralRoutines::own_addr_type = 0;
+    uint8_t BlePeripheralRoutines::addr_val[6] = {0};
+    uint8_t BlePeripheralRoutines::messaging_characteristic_val[2] = {0};
+    uint16_t BlePeripheralRoutines::messaging_characteristic_val_handle = 0;
+    uint16_t BlePeripheralRoutines::messaging_characteristic_conn_handle = 0;
+    bool BlePeripheralRoutines::messaging_characteristic_conn_handle_inited = false;
+    bool BlePeripheralRoutines::messaging_indication_status = false;
+
 ////GAP
 
 //////GAP functions
@@ -264,13 +272,13 @@ void BlePeripheralRoutines::start_advertising(void) {
     }
 
     // Set device address
-    rsp_fields.device_addr = addr_val;
-    rsp_fields.device_addr_type = own_addr_type;
+    rsp_fields.device_addr = BlePeripheralRoutines::addr_val;
+    rsp_fields.device_addr_type = BlePeripheralRoutines::own_addr_type;
     rsp_fields.device_addr_is_present = 1;
 
     // Set URI
-    rsp_fields.uri = esp_uri;
-    rsp_fields.uri_len = sizeof(esp_uri);
+    rsp_fields.uri = BlePeripheralRoutines::esp_uri;
+    rsp_fields.uri_len = sizeof(BlePeripheralRoutines::esp_uri);
 
     // Set advertising interval
     rsp_fields.adv_itvl = BLE_GAP_ADV_ITVL_MS(500);
@@ -292,7 +300,7 @@ void BlePeripheralRoutines::start_advertising(void) {
     adv_params.itvl_max = BLE_GAP_ADV_ITVL_MS(510);
 
     // Start advertising
-    rc = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params,
+    rc = ble_gap_adv_start(BlePeripheralRoutines::own_addr_type, NULL, BLE_HS_FOREVER, &adv_params,
                            BlePeripheralRoutines::gap_event_handler, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "failed to start advertising, error code: %d", rc);
@@ -315,19 +323,19 @@ void BlePeripheralRoutines::adv_init(void) {
     }
 
     // Figure out BT address to use while advertising
-    rc = ble_hs_id_infer_auto(0, &own_addr_type);
+    rc = ble_hs_id_infer_auto(0, &BlePeripheralRoutines::own_addr_type);
     if (rc != 0) {
         ESP_LOGE(TAG, "failed to infer address type, error code: %d", rc);
         return;
     }
 
     // Copy device address to addr_val
-    rc = ble_hs_id_copy_addr(own_addr_type, addr_val, NULL);
+    rc = ble_hs_id_copy_addr(BlePeripheralRoutines::own_addr_type, BlePeripheralRoutines::addr_val, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "failed to copy device address, error code: %d", rc);
         return;
     }
-    BlePeripheralRoutines::format_addr(addr_str, addr_val);
+    BlePeripheralRoutines::format_addr(addr_str, BlePeripheralRoutines::addr_val);
     ESP_LOGI(TAG, "device address: %s", addr_str);
 
     // Start advertising.
@@ -371,11 +379,11 @@ int BlePeripheralRoutines::messaging_characteristic_access(uint16_t conn_handle,
         }
 
         // Verify attribute handle
-        if (attr_handle == messaging_characteristic_val_handle) {
+        if (attr_handle == BlePeripheralRoutines::messaging_characteristic_val_handle) {
             // Update access buffer value
-            messaging_characteristic_val[1] = 0; //CHANGE LATERRRRRR
-            rc = os_mbuf_append(ctxt->om, &messaging_characteristic_val,
-                                sizeof(messaging_characteristic_val));
+            //BlePeripheralRoutines::messaging_characteristic_val[1] = 0; //CHANGE LATERRRRRR
+            rc = os_mbuf_append(ctxt->om, &BlePeripheralRoutines::messaging_characteristic_val,
+                                sizeof(BlePeripheralRoutines::messaging_characteristic_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
         goto error;
@@ -393,18 +401,18 @@ error:
     return BLE_ATT_ERR_UNLIKELY;
 }
 
-void BlePeripheralRoutines::send_messaging_indication(void) {
-    // Check if connection handle is initialized
-    if (!messaging_characteristic_conn_handle_inited) {
-        return;
+bool BlePeripheralRoutines::send_messaging_indication(uint8_t data) {
+    // Check indication and security status
+    if (BlePeripheralRoutines::messaging_characteristic_conn_handle_inited &&
+    BlePeripheralRoutines::messaging_indication_status &&
+    BlePeripheralRoutines::is_connection_encrypted(messaging_characteristic_conn_handle)) {
+        BlePeripheralRoutines::messaging_characteristic_val[1] = data;
+        ble_gatts_indicate(BlePeripheralRoutines::messaging_characteristic_conn_handle,
+                           BlePeripheralRoutines::messaging_characteristic_val_handle);
+        return true;
     }
 
-    // Check indication and security status
-    if (messaging_indication_status &&
-        BlePeripheralRoutines::is_connection_encrypted(messaging_characteristic_conn_handle)) {
-        ble_gatts_indicate(messaging_characteristic_conn_handle,
-                           messaging_characteristic_val_handle);
-    }
+    return false;
 }
 
 //
@@ -452,16 +460,16 @@ void BlePeripheralRoutines::gatt_server_register_cb(struct ble_gatt_register_ctx
 
 //
 //*  GATT server subscribe event callback
-//*      1. Update heart rate subscription status
+//*      1. Update messaging subscription status
 
 
 int BlePeripheralRoutines::gatt_server_subscribe_cb(struct ble_gap_event *event) {
     // Check attribute handle
-    if (event->subscribe.attr_handle == messaging_characteristic_val_handle) {
-        // Update heart rate subscription status
-        messaging_characteristic_conn_handle = event->subscribe.conn_handle;
-        messaging_characteristic_conn_handle_inited = true;
-        messaging_indication_status = event->subscribe.cur_indicate;
+    if (event->subscribe.attr_handle == BlePeripheralRoutines::messaging_characteristic_val_handle) {
+        // Update messaging subscription status
+        BlePeripheralRoutines::messaging_characteristic_conn_handle = event->subscribe.conn_handle;
+        BlePeripheralRoutines::messaging_characteristic_conn_handle_inited = true;
+        BlePeripheralRoutines::messaging_indication_status = event->subscribe.cur_indicate;
 
         // Check security status
         if (!BlePeripheralRoutines::is_connection_encrypted(event->subscribe.conn_handle)) {
@@ -548,7 +556,17 @@ void BlePeripheralRoutines::nimble_host_config_init(void)
     // Set host callbacks
     ble_hs_cfg.reset_cb = BlePeripheralRoutines::on_stack_reset;
     ble_hs_cfg.sync_cb = BlePeripheralRoutines::on_stack_sync;
+    ble_hs_cfg.gatts_register_cb = BlePeripheralRoutines::gatt_server_register_cb;
     ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
+
+    /*
+    // Security manager configuration
+    ble_hs_cfg.sm_io_cap = BLE_HS_IO_DISPLAY_ONLY;
+    ble_hs_cfg.sm_bonding = 1;
+    ble_hs_cfg.sm_mitm = 1;
+    ble_hs_cfg.sm_our_key_dist |= BLE_SM_PAIR_KEY_DIST_ENC | BLE_SM_PAIR_KEY_DIST_ID;
+    ble_hs_cfg.sm_their_key_dist |= BLE_SM_PAIR_KEY_DIST_ENC | BLE_SM_PAIR_KEY_DIST_ID;
+    */
 
     // Store host configuration
     ble_store_config_init();
@@ -568,32 +586,11 @@ void BlePeripheralRoutines::ble_main_task(void *param)
 
 BlePeripheralRoutines::BlePeripheralRoutines() {
     // Local variables
-    addr_val[6] = {0};
-    messaging_characteristic_val[2] = {0};
-    messaging_characteristic_conn_handle = 0;
-    messaging_characteristic_conn_handle_inited = false;
-    messaging_indication_status = false;
-
-    static const struct ble_gatt_svc_def gatt_server_services[] = {
-        // Heart rate service
-        {.type = BLE_GATT_SVC_TYPE_PRIMARY,
-        .uuid = &messaging_service_uuid.u,
-        .characteristics =
-            (struct ble_gatt_chr_def[]){
-                {// Heart rate characteristic
-                .uuid = &messaging_characteristic_uuid.u,
-                .access_cb = &BlePeripheralRoutines::messaging_characteristic_access,
-                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE |
-                        BLE_GATT_CHR_F_READ_ENC,
-                .val_handle = &messaging_characteristic_val_handle},
-                {
-                    0, // No more characteristics in this service.
-                }}},
-
-        {
-            0, // No more services.
-        },
-    };
+    BlePeripheralRoutines::addr_val[6] = {0};
+    BlePeripheralRoutines::messaging_characteristic_val[2] = {0};
+    BlePeripheralRoutines::messaging_characteristic_conn_handle = 0;
+    BlePeripheralRoutines::messaging_characteristic_conn_handle_inited = false;
+    BlePeripheralRoutines::messaging_indication_status = false;
 
     int rc = 0;
     esp_err_t ret = ESP_OK;

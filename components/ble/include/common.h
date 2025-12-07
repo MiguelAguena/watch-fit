@@ -37,7 +37,7 @@ extern "C" {
 #include "nimble/nimble_port_freertos.h"
 
 /* Defines */
-#define TAG "NimBLE_Beacon"
+#define TAG "Node"
 #define DEVICE_NAME "WATCH-FIT_NODE"
 
 #endif // COMMON_H
