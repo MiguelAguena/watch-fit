@@ -15,6 +15,12 @@ class BleCentralRoutines {
         
         void static on_stack_reset(int reason);
         void static on_stack_sync(void);
+        void static central_advertise(void);
+        void static central_scan(void);
+        int static central_client_gap_event(struct ble_gap_event *event, void *arg);
+        int static central_server_gap_event(struct ble_gap_event *event, void *arg);
+        void static central_connect(void *disc);
+        void static central_on_discovery_complete(const struct peer *peer, int status, void *arg);
         void nimble_host_config_init(void);
 
     public:
