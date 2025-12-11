@@ -1,47 +1,13 @@
-/*
- * SPDX-FileCopyrightText: 2015-2025 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-#include <string.h>
-#include "esp_log.h"
-#include "nvs_flash.h"
-/* BLE */
-#include "nimble/nimble_port.h"
-#include "nimble/nimble_port_freertos.h"
-#include "host/ble_hs.h"
-#include "host/util/util.h"
-#include "services/gap/ble_svc_gap.h"
-#include "ble_multi_conn_cent.h"
-
-#define BLE_PEER_NAME           "esp-multi-conn"
-#define BLE_PEER_MAX_NUM        (MYNEWT_VAL(BLE_MAX_CONNECTIONS) - 1)
-#define BLE_PREF_EVT_LEN_MS     (5)
-#define BLE_PREF_CONN_ITVL_MS   (BLE_PEER_MAX_NUM * BLE_PREF_EVT_LEN_MS)
-
-static const char *TAG = "ESP_MULTI_CONN_CENT";
-
-static const ble_uuid_t *remote_svc_uuid =
-    BLE_UUID128_DECLARE(0x2d, 0x71, 0xa2, 0x59, 0xb4, 0x58, 0xc8, 0x12,
-                     	0x99, 0x99, 0x43, 0x95, 0x12, 0x2f, 0x46, 0x59);
-
-static uint8_t ext_adv_pattern_1[] = {
-    0x02, 0x01, 0x06,
-    0x14, 0X09, 'e', 's', 'p', '-', 'b', 'l', 'e', '-', 'r', 'o', 'l', 'e', '-', 'c', 'o', 'e', 'x', '-', 'e',
-};
 
 void ble_store_config_init(void);
 static void ble_cent_advertise(void);
 static void ble_cent_scan(void);
 static void ble_cent_connect(void *disc);
 
-static uint8_t s_ble_multi_conn_num = 0;
-
 /**
  * Called when service discovery of the specified peer has completed.
  */
-static void
-ble_cent_on_disc_complete(const struct peer *peer, int status, void *arg)
+static void ble_cent_on_discovery_complete(const struct peer *peer, int status, void *arg)
 {
 
     if (status != 0) {
@@ -103,7 +69,7 @@ ble_cent_client_gap_event(struct ble_gap_event *event, void *arg)
                 ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
             } else {
                 /* Perform service discovery */
-                rc = peer_disc_svc_by_uuid(event->connect.conn_handle, remote_svc_uuid,
+                rc = peer_disc_svc_by_uuid(event->connect.conn_handle, remote_service_uuid,
                                         ble_cent_on_disc_complete, NULL);
                 if(rc != 0) {
                     ESP_LOGE(TAG, "Failed to discover services; rc=%d\n", rc);
@@ -190,22 +156,6 @@ ble_cent_server_gap_event(struct ble_gap_event *event, void *arg)
         ble_cent_advertise();
         return 0;
 
-#if MYNEWT_VAL(BLE_POWER_CONTROL)
-    case BLE_GAP_EVENT_TRANSMIT_POWER:
-        ESP_LOGD(TAG, "Transmit power event : status=%d conn_handle=%d reason=%d phy=%d "
-                 "power_level=%x power_level_flag=%d delta=%d", event->transmit_power.status,
-                 event->transmit_power.conn_handle, event->transmit_power.reason,
-                 event->transmit_power.phy, event->transmit_power.transmit_power_level,
-                 event->transmit_power.transmit_power_level_flag, event->transmit_power.delta);
-        return 0;
-
-    case BLE_GAP_EVENT_PATHLOSS_THRESHOLD:
-        ESP_LOGD(TAG, "Pathloss threshold event : conn_handle=%d current path loss=%d "
-                 "zone_entered =%d", event->pathloss_threshold.conn_handle,
-                 event->pathloss_threshold.current_path_loss, event->pathloss_threshold.zone_entered);
-        return 0;
-#endif
-
     default:
         return 0;
     }
@@ -247,9 +197,9 @@ ble_cent_advertise(void)
     assert(rc == 0);
 
     /* Get mbuf for adv data */
-    data = os_msys_get_pkthdr(sizeof(ext_adv_pattern_1), 0);
+    data = os_msys_get_pkthdr(sizeof(ext_advertise_pattern_1), 0);
     assert(data);
-    rc = os_mbuf_append(data, ext_adv_pattern_1, sizeof(ext_adv_pattern_1));
+    rc = os_mbuf_append(data, ext_advertise_pattern_1, sizeof(ext_advertise_pattern_1));
     assert(rc == 0);
 
     rc = ble_gap_ext_adv_set_data(instance, data);

@@ -1,16 +1,8 @@
 #pragma once
 #include "common.h"
-//GAP includes and defines
-#include "host/ble_gap.h"
-#include "services/gap/ble_svc_gap.h"
-#include <iostream>
 #define BLE_GAP_APPEARANCE_GENERIC_TAG 0x0200
 #define BLE_GAP_URI_PREFIX_HTTPS 0x17
 #define BLE_GAP_LE_ROLE_PERIPHERAL 0x00
-
-//GATT includes and defines
-#include "host/ble_gatt.h"
-#include "services/gatt/ble_svc_gatt.h"
 
 class BlePeripheralRoutines {
     private:
@@ -55,20 +47,23 @@ class BlePeripheralRoutines {
 
         inline static struct ble_gatt_svc_def gatt_server_services[] = {
             // Messaging service
-            {.type = BLE_GATT_SVC_TYPE_PRIMARY,
-            .uuid = &BlePeripheralRoutines::messaging_service_uuid.u,
-            .characteristics =
-                (struct ble_gatt_chr_def[]){
+            {
+                .type = BLE_GATT_SVC_TYPE_PRIMARY,
+                .uuid = &BlePeripheralRoutines::messaging_service_uuid.u,
+                .characteristics = (struct ble_gatt_chr_def[])
+                {
                     {// Messaging characteristic
-                    .uuid = &BlePeripheralRoutines::messaging_characteristic_uuid.u,
-                    .access_cb = &BlePeripheralRoutines::messaging_characteristic_access,
-                    .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE |
-                            BLE_GATT_CHR_F_READ_ENC,
-                    .val_handle = &BlePeripheralRoutines::messaging_characteristic_val_handle},
+                        .uuid = &BlePeripheralRoutines::messaging_characteristic_uuid.u,
+                        .access_cb = &BlePeripheralRoutines::messaging_characteristic_access,
+                        .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE |
+                                BLE_GATT_CHR_F_READ_ENC,
+                        .val_handle = &BlePeripheralRoutines::messaging_characteristic_val_handle
+                    },
                     {
                         0, // No more characteristics in this service.
-                    }}},
-
+                    }
+                }
+            },
             {
                 0, // No more services.
             },
