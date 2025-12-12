@@ -1,0 +1,52 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/miguelaguena/.espressif/python_env/idf5.5_py3.12_env/bin/python -DESP_PLATFORM=1 -DIDF_TARGET=esp32c3 -DCCACHE_ENABLE=0 /home/miguelaguena/Documents/watch-fit
+-- Existing sdkconfig '/home/miguelaguena/Documents/watch-fit/sdkconfig' renamed to '/home/miguelaguena/Documents/watch-fit/sdkconfig.old'.
+-- Found Git: /usr/bin/git (found version "2.43.0") 
+-- Minimal build - ON
+-- The C compiler identification is GNU 14.2.0
+-- The CXX compiler identification is GNU 14.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /home/miguelaguena/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/miguelaguena/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/miguelaguena/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Building ESP-IDF components for target esp32c3
+-- Project sdkconfig file /home/miguelaguena/Documents/watch-fit/sdkconfig
+Loading defaults file /home/miguelaguena/Documents/watch-fit/sdkconfig.defaults...
+Loading defaults file /home/miguelaguena/Documents/watch-fit/sdkconfig.defaults.esp32c3...
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/riscv/ld/rom.api.ld
+-- Found Python3: /home/miguelaguena/.espressif/python_env/idf5.5_py3.12_env/bin/python (found version "3.12.3") found components: Interpreter 
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS - Success
+-- USING O3
+-- App "ble" version: 63d5313-dirty
+-- Adding linker script /home/miguelaguena/Documents/watch-fit/build/esp-idf/esp_system/ld/memory.ld
+-- Adding linker script /home/miguelaguena/Documents/watch-fit/build/esp-idf/esp_system/ld/sections.ld.in
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.api.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.bt_funcs.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.libgcc.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.version.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.ble_50.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.ble_cca.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.ble_test.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.eco3.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.eco3_bt_funcs.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.libc.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.libc-suboptimal_for_misaligned_mem.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/esp_rom/esp32c3/ld/esp32c3.rom.newlib.ld
+-- Adding linker script /home/miguelaguena/esp/esp-idf/components/soc/esp32c3/ld/esp32c3.peripherals.ld
+-- Components: app_update bootloader bootloader_support bt cxx efuse esp_app_format esp_bootloader_format esp_coex esp_common esp_driver_gpio esp_driver_spi esp_driver_uart esp_driver_usb_serial_jtag esp_event esp_gdbstub esp_hw_support esp_mm esp_netif esp_netif_stack esp_partition esp_phy esp_pm esp_ringbuf esp_rom esp_security esp_system esp_timer esp_vfs_console esp_wifi esptool_py freertos hal heap log lwip main mbedtls newlib nvs_flash partition_table pthread riscv soc spi_flash vfs wpa_supplicant
+-- Component paths: /home/miguelaguena/esp/esp-idf/components/app_update /home/miguelaguena/esp/esp-idf/components/bootloader /home/miguelaguena/esp/esp-idf/components/bootloader_support /home/miguelaguena/esp/esp-idf/components/bt /home/miguelaguena/esp/esp-idf/components/cxx /home/miguelaguena/esp/esp-idf/components/efuse /home/miguelaguena/esp/esp-idf/components/esp_app_format /home/miguelaguena/esp/esp-idf/components/esp_bootloader_format /home/miguelaguena/esp/esp-idf/components/esp_coex /home/miguelaguena/esp/esp-idf/components/esp_common /home/miguelaguena/esp/esp-idf/components/esp_driver_gpio /home/miguelaguena/esp/esp-idf/components/esp_driver_spi /home/miguelaguena/esp/esp-idf/components/esp_driver_uart /home/miguelaguena/esp/esp-idf/components/esp_driver_usb_serial_jtag /home/miguelaguena/esp/esp-idf/components/esp_event /home/miguelaguena/esp/esp-idf/components/esp_gdbstub /home/miguelaguena/esp/esp-idf/components/esp_hw_support /home/miguelaguena/esp/esp-idf/components/esp_mm /home/miguelaguena/esp/esp-idf/components/esp_netif /home/miguelaguena/esp/esp-idf/components/esp_netif_stack /home/miguelaguena/esp/esp-idf/components/esp_partition /home/miguelaguena/esp/esp-idf/components/esp_phy /home/miguelaguena/esp/esp-idf/components/esp_pm /home/miguelaguena/esp/esp-idf/components/esp_ringbuf /home/miguelaguena/esp/esp-idf/components/esp_rom /home/miguelaguena/esp/esp-idf/components/esp_security /home/miguelaguena/esp/esp-idf/components/esp_system /home/miguelaguena/esp/esp-idf/components/esp_timer /home/miguelaguena/esp/esp-idf/components/esp_vfs_console /home/miguelaguena/esp/esp-idf/components/esp_wifi /home/miguelaguena/esp/esp-idf/components/esptool_py /home/miguelaguena/esp/esp-idf/components/freertos /home/miguelaguena/esp/esp-idf/components/hal /home/miguelaguena/esp/esp-idf/components/heap /home/miguelaguena/esp/esp-idf/components/log /home/miguelaguena/esp/esp-idf/components/lwip /home/miguelaguena/Documents/watch-fit/main /home/miguelaguena/esp/esp-idf/components/mbedtls /home/miguelaguena/esp/esp-idf/components/newlib /home/miguelaguena/esp/esp-idf/components/nvs_flash /home/miguelaguena/esp/esp-idf/components/partition_table /home/miguelaguena/esp/esp-idf/components/pthread /home/miguelaguena/esp/esp-idf/components/riscv /home/miguelaguena/esp/esp-idf/components/soc /home/miguelaguena/esp/esp-idf/components/spi_flash /home/miguelaguena/esp/esp-idf/components/vfs /home/miguelaguena/esp/esp-idf/components/wpa_supplicant
+-- Configuring done (6.9s)
+-- Generating done (0.5s)
+-- Build files have been written to: /home/miguelaguena/Documents/watch-fit/build

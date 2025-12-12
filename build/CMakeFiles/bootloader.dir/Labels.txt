@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/miguelaguena/Documents/watch-fit/build/CMakeFiles/bootloader
+/home/miguelaguena/Documents/watch-fit/build/CMakeFiles/bootloader.rule
+/home/miguelaguena/Documents/watch-fit/build/CMakeFiles/bootloader-complete.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/miguelaguena/Documents/watch-fit/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

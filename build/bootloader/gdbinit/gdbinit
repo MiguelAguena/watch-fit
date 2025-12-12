@@ -1,0 +1,2 @@
+source /home/miguelaguena/Documents/watch-fit/build/bootloader/gdbinit/symbols
+source /home/miguelaguena/Documents/watch-fit/build/bootloader/gdbinit/connect
