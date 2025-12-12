@@ -1,5 +1,10 @@
 #pragma once
 #include "common.h"
+#include <iostream>
+#define BLE_PEER_NAME           "esp-multi-conn"
+#define BLE_PEER_MAX_NUM        (MYNEWT_VAL(BLE_MAX_CONNECTIONS) - 1)
+#define BLE_PREF_EVT_LEN_MS     (5)
+#define BLE_PREF_CONN_ITVL_MS   (BLE_PEER_MAX_NUM * BLE_PREF_EVT_LEN_MS)
 #define BLE_GAP_APPEARANCE_GENERIC_TAG 0x0200
 #define BLE_GAP_URI_PREFIX_HTTPS 0x17
 #define BLE_GAP_LE_ROLE_PERIPHERAL 0x00
@@ -13,6 +18,9 @@ class BlePeripheralRoutines {
         int static gap_event_handler(struct ble_gap_event *event, void *arg);
         void static start_advertising(void);
         void static adv_init(void);
+        void static scan_init(void);
+        int static central_client_gap_event(struct ble_gap_event *event, void *arg);
+        void static central_connect(void *disc);
         bool static is_connection_encrypted(uint16_t conn_handle);
         int gap_init(void);
 
@@ -27,6 +35,8 @@ class BlePeripheralRoutines {
         void nimble_host_config_init(void);
         
     public:
+        static uint8_t s_ble_multi_conn_num;
+
         static constexpr ble_uuid16_t messaging_service_uuid = BLE_UUID16_INIT(0x180D);
         static constexpr ble_uuid16_t messaging_characteristic_uuid = BLE_UUID16_INIT(0x2A37);
         static constexpr uint8_t esp_uri[] = {BLE_GAP_URI_PREFIX_HTTPS, '/', '/', 'e', 's', 'p', 'r', 'e', 's', 's', 'i', 'f', '.', 'c', 'o', 'm'};
@@ -43,7 +53,7 @@ class BlePeripheralRoutines {
         bool send_messaging_indication(uint8_t data);
         int static messaging_characteristic_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
         BlePeripheralRoutines();
-        void ble_main_task(void *param);
+        void static ble_main_task(void *param);
 
         inline static struct ble_gatt_svc_def gatt_server_services[] = {
             // Messaging service

@@ -17,7 +17,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <iostream>
 
 /* ESP APIs */
 #include "esp_log.h"
@@ -40,6 +39,7 @@ extern "C" {
 #include "services/gap/ble_svc_gap.h"
 #include "host/ble_gatt.h"
 #include "services/gatt/ble_svc_gatt.h"
+#include "esp_central.h"
 
 /* Defines */
 #define TAG "Node"
